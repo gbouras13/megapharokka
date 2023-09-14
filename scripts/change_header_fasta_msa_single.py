@@ -172,11 +172,11 @@ def main():
             fasta_records.append(record)
 
     # Write all records except the first one to the output FASTA file
-    with open(f"{out_dir}/{header}.fasta", "w") as output_handle:
+    with open(out_fasta, "w") as output_handle:
         SeqIO.write(fasta_records[1:], output_handle, "fasta")
 
     # Write  the first one to the consensus FASTA file
-    with open(f"{cons_dir}/{header}.fasta", "w") as output_handle:
+    with open(cons_fasta, "w") as output_handle:
         SeqIO.write(fasta_records[0], output_handle, "fasta")
 
 

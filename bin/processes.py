@@ -1,6 +1,7 @@
 import os
 import subprocess as sp
 from datetime import datetime
+import multiprocessing.pool
 
 import pandas as pd
 import pyrodigal
@@ -14,26 +15,29 @@ from loguru import logger
 from util import remove_directory
 
 
-def run_pyrodigal_gv(filepath_in, out_dir):
+def run_pyrodigal_gv(filepath_in, out_dir, threads):
     """
     Gets CDS using pyrodigal_gv
     :param filepath_in: input filepath
     :param out_dir: output directory
-    :param logger logger
-    :param meta Boolean - metagenomic mode flag
-    :param coding_table coding table for prodigal (default 11)
+    :param threads: int
     :return:
     """
 
     # true
     orf_finder = pyrodigal_gv.ViralGeneFinder(meta=True)
 
-    with open(os.path.join(out_dir, "prodigal-gv_out.gff"), "w") as dst:
-        with open(os.path.join(out_dir, "prodigal-gv_out_tmp.fasta"), "w") as gff:
-            for i, record in enumerate(SeqIO.parse(filepath_in, "fasta")):
-                genes = orf_finder.find_genes(str(record.seq))
-                genes.write_gff(dst, sequence_id=record.id, include_translation_table=True)
-                genes.write_genes(gff, sequence_id=record.id)
+    def _find_genes(record):
+            genes = orf_finder.find_genes(str(record.seq))
+            return (record.id, genes)
+
+    with multiprocessing.pool.ThreadPool(threads) as pool:
+        with open(os.path.join(out_dir, "prodigal-gv_out.gff"), "w") as gff:
+            with open(os.path.join(out_dir, "prodigal-gv_out_tmp.fasta"), "w") as fasta:
+                records = SeqIO.parse(filepath_in, "fasta")
+                for record_id, genes in pool.imap(_find_genes, records):
+                    genes.write_gff(gff, sequence_id=record_id, include_translation_table=True)
+                    genes.write_genes(fasta, sequence_id=record_id)
 
 ##### phanotate meta mode ########
 
@@ -277,14 +281,14 @@ def run_phanotate(filepath_in, out_dir, logdir):
         logger.error("Error with Phanotate\n")
 
 
-def run_pyrodigal(filepath_in, out_dir, meta, coding_table):
+def run_pyrodigal(filepath_in, out_dir, meta, coding_table, threads):
     """
     Gets CDS using pyrodigal
     :param filepath_in: input filepath
     :param out_dir: output directory
-    :param logger logger
     :param meta Boolean - metagenomic mode flag
     :param coding_table coding table for prodigal (default 11)
+    :param threads int
     :return:
     """
 
@@ -300,15 +304,19 @@ def run_pyrodigal(filepath_in, out_dir, meta, coding_table):
 
     # coding table possible if false
     if prodigal_metamode == False:
-        trainings_info = orf_finder.train(*seqs, translation_table=int(coding_table))
-        orf_finder = pyrodigal.GeneFinder(trainings_info, meta=prodigal_metamode)
+        orf_finder.train(*seqs, translation_table=int(coding_table))
 
-    with open(os.path.join(out_dir, "prodigal_out.gff"), "w") as dst:
-        with open(os.path.join(out_dir, "prodigal_out_tmp.fasta"), "w") as gff:
-            for i, record in enumerate(SeqIO.parse(filepath_in, "fasta")):
-                genes = orf_finder.find_genes(str(record.seq))
-                genes.write_gff(dst, sequence_id=record.id)
-                genes.write_genes(gff, sequence_id=record.id)
+    def _find_genes(record):
+        genes = orf_finder.find_genes(str(record.seq))
+        return (record.id, genes)
+
+    with multiprocessing.pool.ThreadPool(threads) as pool:
+        with open(os.path.join(out_dir, "prodigal_out.gff"), "w") as dst:
+            with open(os.path.join(out_dir, "prodigal_out_tmp.fasta"), "w") as gff:
+                records = SeqIO.parse(filepath_in, "fasta")
+                for record_id, genes in pool.imap(_find_genes, records):
+                    genes.write_gff(dst, sequence_id=record_id)
+                    genes.write_genes(gff, sequence_id=record_id)
 
 
 def tidy_phanotate_output(out_dir):

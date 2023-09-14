@@ -40,7 +40,6 @@ setup(
     scripts=[
         "bin/megapharokka.py",
         "bin/pharokka_plotter.py",
-        "bin/install_databases.py",
         "bin/pharokka_proteins.py",
         "bin/citation.py",
         "bin/databases.py",
@@ -54,7 +53,6 @@ setup(
         "bin/util.py",
         "bin/version.py",
         "bin/create_custom_hmm.py",
-        "bin/custom_db.py",
     ],
     packages=["pharokka_runner"],
     package_dir=dict(pharokka_runner="bin"),

@@ -36,7 +36,7 @@ cd megapharokka
 
 ```
 mamba env  create -f environment.yml 
-conda activate pharokka_env
+conda activate megapharokka_env
 ```
 
 3. Install `megapharokka` and most python dependecies with `pip`

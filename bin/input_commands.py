@@ -61,7 +61,7 @@ def get_input():
         "-g",
         "--gene_predictor",
         action="store",
-        help='User specified gene predictor. Use "-g phanotate" or "-g prodigal". \nDefaults to phanotate (not required unless prodigal is desired).',
+        help='User specified gene predictor. Use "-g phanotate" or "-g prodigal" or "-g prodigal-gv". \nDefaults to phanotate (not required unless prodigal is desired).',
         default="phanotate",
     )
     parser.add_argument(
@@ -186,7 +186,7 @@ def validate_gene_predictor(gene_predictor, genbank_flag):
             )
     else:
         logger.error(
-            "Error: gene predictor was incorrectly specified. Please use 'phanotate', 'prodigal', 'prodigal-gv' or 'custom'."
+            "Error: gene predictor was incorrectly specified. Please use 'phanotate', 'prodigal' or 'prodigal-gv'."
         )
 
 

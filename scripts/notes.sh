@@ -80,7 +80,10 @@ done
 # find -type f -name '*' | wc -l
 
 # 6. convert to hmms for pyhmmer
-create_custom_hmm.py -i fasta_msas_with_header -o pyhmmer_hmms -p enVhog
+create_custom_hmm.py -i fasta_msas_with_header -o pyhmmer_hmms -p enVhogs
 
-# resulting file will be `pyhmmer_hmms/enVhog.h3m`
+# resulting db file will be `pyhmmer_hmms/enVhogs.h3m`
 
+# 7. Create envhogs_annot_140923.tsv from cluster_info.tsv.gz
+
+$scripts_dir/filter_clusters_tsv.py -i cluster_info.tsv.gz -o envhogs_db/envhogs_annot_140923.tsv

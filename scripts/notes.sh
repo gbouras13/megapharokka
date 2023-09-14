@@ -27,25 +27,26 @@ input_dir="a3ms"
 output_dir="fasta_msas"
 mkdir -p $output_dir
 
-input_dir="a3ms"
-
 # Loop through all files in the input directory with a3m extension
 # allows for multithreaded use
 
-for input_file in "$input_dir"/*; do
-    # Extract the base file name (without extension)
-
+# Function to process a single file
+process_file() {
+    input_file="$1"
     base_name=$(basename "$input_file" .a3m)
-    
-    # Define the output file with the same base name but in the output directory
-    output_file="$output_dir/$base_name.fas"
-    
-    # Run the reformat.pl script on the input file and save the output to the output file
-    # for some reason on linux not with conda
+    output_file="$input_dir/$base_name.fas"
     $scripts_dir/reformat.pl a3m fas "$input_file" "$output_file"
     
     echo "Processed: $input_file -> $output_file"
+}
+
+# Loop through all files in the input directory with a3m extension and process them concurrently
+for input_file in "$input_dir"/*; do
+    process_file "$input_file" &
 done
+
+
+
 
 # 5. rename the FASTA MSAs with the matching header as the metadata, and remove consensus sequence
 

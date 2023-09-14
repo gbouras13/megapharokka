@@ -34,7 +34,7 @@ mkdir -p $output_dir
 process_file() {
     input_file="$1"
     base_name=$(basename "$input_file" .a3m)
-    output_file="$input_dir/$base_name.fas"
+    output_file="$output_dir/$base_name.fas"
     $scripts_dir/reformat.pl a3m fas "$input_file" "$output_file"
     
     echo "Processed: $input_file -> $output_file"

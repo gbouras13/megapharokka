@@ -1,11 +1,21 @@
 # megapharokka
 A fork of Pharokka to handle enVhogs
 
-# Creation of enVhog hmm profile for use with pyhmmer
+# Table of Contents
+
+- [megapharokka](#megapharokka)
+- [Table of Contents](#table-of-contents)
+- [Creation of enVhog HMM profile Databases for use with pyhmmer](#creation-of-envhog-hmm-profile-databases-for-use-with-pyhmmer)
+- [Installing megapharokka](#installing-megapharokka)
+- [Running megapharokka](#running-megapharokka)
+- [Database](#database)
+
+
+# Creation of enVhog HMM profile Databases for use with pyhmmer
 
 See `scripts/notes.sh`
 
-1. Download and untar the tarball
+1. Download and untar the tarball (ends up about 60GB).
 2. Extract the a3m files from hhsuite formatted files
 3. Convert s3m to FASTA MSA
 4. Rename MSA to match metadata and remove consensus sequence
@@ -22,22 +32,23 @@ git clone https://github.com/gbouras13/megapharokka
 cd megapharokka
 ```
 
-2. Create conda env with external dependencies
+2. Create conda env with external dependencies installed
 
 ```
 mamba env  create -f environment.yml 
 conda activate pharokka_env
 ```
 
-3. Install with `pip`
+3. Install `megapharokka` and most python dependecies with `pip`
 
 ```
 pip install .
 ```
 
-4. Install `pyrodigal` v3 and `pyrodigal-gv` pre-release
+4. Install `pyrodigal` v3 and `pyrodigal-gv` pre-releases
 
-* Martin Larralde has not yet made production releases to be compatible with `pyrodigal-gv`
+* Martin Larralde the creator and maintainer of these tools at EMBL Heidelberg has not yet made production releases. `pyrodigal` v3 is required to be compatible with `pyrodigal-gv` (essentially he made it in response to an issue in and for Pharokka).
+* When he releases it I will update.
 
 ```
 pip install -U --pre pyrodigal

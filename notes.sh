@@ -1,5 +1,7 @@
 #### 
 
+scripts_dir="megapharokka/scripts"
+
 # 1. download the EnVhog.tar.gz
 
 wget "envhog.u-ga.fr/envhog/EnVhog_HMMs/EnVhog.tar.gz"
@@ -17,7 +19,7 @@ conda activate hhsuite
 mkdir -p a3ms
 ffindex_unpack envhog_hmm/EnVhog_a3m.ffdata  envhog_hmm/EnVhog_a3m.ffindex  a3ms/ .
 
-# 4. reformat the a3ms to FASTA MSAs
+# 4. reformat the a3ms to FASTA MSAs - taken from hhsuite
 # Source directory containing the input files
 input_dir="a3ms"
 
@@ -40,7 +42,7 @@ for input_file in "$input_dir"/*; do
     
     # Run the reformat.pl script on the input file and save the output to the output file
     # for some reason on linux not with conda
-    ./hh-suite/scripts/reformat.pl a3m fas "$input_file" "$output_file"
+    $scripts_dir/reformat.pl a3m fas "$input_file" "$output_file"
     
     echo "Processed: $input_file -> $output_file"
 done
@@ -65,7 +67,7 @@ process_file() {
     base_name=$(basename "$msa_file" .fas)
     a3m_file="$a3m_dir/$base_name"
 
-    python change_header_fasta_msa_single.py -a "$a3m_file" -m "$msa_file" -o $fasta_msas_with_header_dir -c $consensus_fasta_dir
+    python $scripts_dir/change_header_fasta_msa_single.py -a "$a3m_file" -m "$msa_file" -o $fasta_msas_with_header_dir -c $consensus_fasta_dir
     echo "Processed: $base_name "
 }
 
@@ -74,6 +76,7 @@ for input_file in "$msa_dir"/*.fas; do
     process_file "$input_file" &
 done
 
+# find -type f -name '*' | wc -l
 
 # 6. convert to hmms for pyhmmer
 create_custom_hmm.py -i fasta_msas_with_header -o pyhmmer_hmms -p enVhog

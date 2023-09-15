@@ -2116,6 +2116,9 @@ def remove_post_processing_files(out_dir, gene_predictor, meta):
     # if genbank input
     remove_file(os.path.join(out_dir, "genbank.fasta"))
 
+    # hhsuote
+    remove_directory(os.path.join(out_dir,"hhsuite_target_dir"))
+
 
 def get_crispr_count(out_dir, prefix):
     """

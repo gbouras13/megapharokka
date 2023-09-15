@@ -238,7 +238,7 @@ def main():
 
     logger.info("Post Processing Output.")
 
-    process_hhsuite_results(out_dir)
+    hhsuite_tophits_df = process_hhsuite_results(out_dir)
 
     # instanatiate the class with some of the params
     pharok = Pharok()
@@ -256,6 +256,7 @@ def main():
     pharok.trna_version = trna_version
     pharok.aragorn_version = aragorn_version
     pharok.minced_version = minced_version
+    pharok.hhsuite_tophits_df = hhsuite_tophits_df
 
 
     #####################################

@@ -55,6 +55,7 @@ class Pharok:
         prot_seq_df: pd.DataFrame() = pd.DataFrame(
             {"col1": [1, 2, 3], "col2": [4, 5, 6]}
         ),
+        hhsuite_tophits_df: pd.DataFrame() = pd.DataFrame({"col1": [1, 2, 3], "col2": [4, 5, 6]}),
         tmrna_flag: bool = False,
         trna_empty: bool = False,
         crispr_count: int = 0,
@@ -158,6 +159,7 @@ class Pharok:
         self.aragorn_version = aragorn_version
         self.minced_version = minced_version
         self.prot_seq_df = prot_seq_df
+        self.hhsuite_tophits_df = hhsuite_tophits_df
 
     def process_results(self):
         """
@@ -236,7 +238,7 @@ class Pharok:
 
         # Adds pyhmmer results if tru
 
-        merged_df = process_pyhmmer_results(merged_df, self.pyhmmer_results_dict)
+        merged_df = process_hhsuite_results(merged_df, self.hhsuite_tophits_df)
 
 
         # read in envhog annotaion file
@@ -2524,39 +2526,17 @@ def check_and_create_directory(directory):
 
 
 
-def process_hhsuite_results(out_dir):
+def process_hhsuite_results(self, merged_df):
     """
-    Gets CDS using pyrodigal_gv
+    merges in hhsuite output 
     :param filepath_in: input filepath
     :param out_dir: output directory
     :param threads: int
     :return:
     """
+
+
+    merged_df = merged_df.merge(self.tophits_df, on="gene", how="left")
+    return merged_df
     
-    target_db_dir = os.path.join(out_dir, "hhsuite_target_dir")
-    hhresult_file =  os.path.join(target_db_dir, "results_your_seq_VS_EnVhog.ffdata")
 
-    df = hhparse(hhresult_file) # verbose
-    print(df)
-
-
-
-    logger.info("Processing hhsuite output")
-    col_list = ["gene_hmm", "phrog_hmm", "seqIdentity_hmm", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "eVal_hmm", "alnScore_hmm"] 
-   
-   
-    hhsuite_df = pd.read_csv(hhsuite_file, delimiter= '\t', index_col=False , names=col_list) 
-    genes = hhsuite_df.gene_hmm.unique()
-    # remove nan
-    genes = [x for x in genes if str(x) != 'nan']
-    tophits = []
-    for gene in genes:
-        tmp_df = hhsuite_df.loc[hhsuite_df['gene_hmm'] == gene].sort_values('eVal_hmm').reset_index(drop=True).iloc[0]
-        tophits.append([tmp_df.phrog_hmm, tmp_df.gene_hmm, tmp_df.alnScore_hmm, tmp_df.seqIdentity_hmm, tmp_df.eVal_hmm])
-    tophits_hmm__df = pd.DataFrame(tophits, columns=['phrog_hmm', 'gene_hmm', 'alnScore_hmm', 'seqIdentity_hmm', 'eVal_hmm'])
-    # filter from 0 to end for savings
-    tophits_hmm__df[['spl','ind']] = tophits_hmm__df['gene_hmm'].str.split('delimiter',expand=True)
-    tophits_hmm__df[['ind']] = tophits_hmm__df[['ind']].astype(int)
-    tophits_hmm__df = tophits_hmm__df.sort_values(by=['ind']).drop(columns = ['spl', 'ind'])
-    tophits_hmm__df.to_csv(os.path.join(out_dir, "top_hits_hhsuite.tsv"), sep="\t", index=False)
-    

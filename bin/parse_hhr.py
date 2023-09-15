@@ -4,10 +4,11 @@ Function to parse the hhsuite output and returns the tophit hhsuite dataframe
 import pandas as pd
 import os
 
-def process_hhsuite_results(out_dir):
+def process_hhsuite_results(out_dir, eval):
     """
     wraps hhparse
     :param out_dir: output directory
+    :param eval: evalue threshold
     :return: tophits_df tophit for every gene if it exists
     """
     
@@ -80,6 +81,8 @@ def hhparse(hhresult_file):
         'hhsuite_Identities': identities_list,
         'hhsuite_Similarity': similarity_list
     })
+
+    tophits_df = tophits_df[tophits_df['hhsuite_evalue'] < eval]
     
 
     return tophits_df

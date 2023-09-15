@@ -238,7 +238,7 @@ def main():
 
     logger.info("Post Processing Output.")
 
-    hhsuite_tophits_df = process_hhsuite_results(out_dir)
+    hhsuite_tophits_df = process_hhsuite_results(out_dir, args.evalue)
 
     # instanatiate the class with some of the params
     pharok = Pharok()

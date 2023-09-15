@@ -23,6 +23,7 @@ from processes import (concat_phanotate_meta, concat_trnascan_meta,
                        run_trnascan_meta, split_input_fasta, translate_fastas)
 from util import count_contigs, get_version
 from run_hhsuite import run_hhindex_hhblits
+from post_processing import process_hhsuite_results
 
 
 def main():
@@ -228,7 +229,7 @@ def main():
     # )
     logger.info("Running hhsuite on EnVhogs.")
 
-    run_hhindex_hhblits(out_dir, gene_predictor, db_dir, args.threads, logdir)
+    # run_hhindex_hhblits(out_dir, gene_predictor, db_dir, args.threads, logdir)
 
 
     #################################################
@@ -236,6 +237,8 @@ def main():
     #################################################
 
     logger.info("Post Processing Output.")
+
+    process_hhsuite_results(out_dir)
 
     # instanatiate the class with some of the params
     pharok = Pharok()
@@ -253,7 +256,7 @@ def main():
     pharok.trna_version = trna_version
     pharok.aragorn_version = aragorn_version
     pharok.minced_version = minced_version
-    pharok.pyhmmer_results_dict = best_results_pyhmmer
+
 
     #####################################
     # post processing

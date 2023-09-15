@@ -87,3 +87,17 @@ create_custom_hmm.py -i fasta_msas_with_header -o pyhmmer_hmms -p enVhogs
 # 7. Create envhogs_annot_140923.tsv from cluster_info.tsv.gz
 
 $scripts_dir/filter_clusters_tsv.py -i cluster_info.tsv.gz -o envhogs_db/envhogs_annot_140923.tsv
+
+
+###########################
+# using hhsuite instead
+
+# to make a subset db for trying out megapharokka in dev mode
+
+conda activate hhsuite
+
+ffindex_build -as envhog_subset_a3m.ffdata enhvog_subset_a3m.ffindex a3ms
+
+ffindex_apply envhog_subset_a3m.ff{data,index} -i envhog_subset_hhm.ffindex -d envhog_subset_hhm.ffdata -- hhmake -i stdin -o stdout -v 0
+
+cstranslate -i envhog_subset_a3m -A cs219.lib -o envhog_subset_cs219 -b -f -I a3m

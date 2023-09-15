@@ -64,6 +64,9 @@ def hhparse(hhresult_file):
     # Save the DataFrame to a CSV file
     #df.to_csv('output.csv', index=False)
 
+    print(df)
+
+    return df
 
 
 

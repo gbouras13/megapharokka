@@ -22,6 +22,7 @@ from processes import (concat_phanotate_meta, concat_trnascan_meta,
                        run_pyrodigal, run_pyrodigal_gv, run_trna_scan,
                        run_trnascan_meta, split_input_fasta, translate_fastas)
 from util import count_contigs, get_version
+from run_hhsuite import run_hhindex_hhblits
 
 
 def main():
@@ -201,30 +202,33 @@ def main():
     run_aragorn(input_fasta, out_dir, prefix, logdir)
 
     # running mmseqs2 on the 2 CARD and VFDB
-    run_mmseqs(
-        db_dir,
-        out_dir,
-        args.threads,
-        logdir,
-        gene_predictor,
-        args.evalue,
-        db_name="CARD",
-    )
-    run_mmseqs(
-        db_dir,
-        out_dir,
-        args.threads,
-        logdir,
-        gene_predictor,
-        args.evalue,
-        db_name="VFDB",
-    )
+    # run_mmseqs(
+    #     db_dir,
+    #     out_dir,
+    #     args.threads,
+    #     logdir,
+    #     gene_predictor,
+    #     args.evalue,
+    #     db_name="CARD",
+    # )
+    # run_mmseqs(
+    #     db_dir,
+    #     out_dir,
+    #     args.threads,
+    #     logdir,
+    #     gene_predictor,
+    #     args.evalue,
+    #     db_name="VFDB",
+    # )
 
     # runs pyhmmer on enVhogsROGs
-    logger.info("Running PyHMMER on EnVhogs.")
-    best_results_pyhmmer = run_pyhmmer_envhogs(
-        db_dir, out_dir, args.threads, gene_predictor, args.evalue
-    )
+    # logger.info("Running PyHMMER on EnVhogs.")
+    # best_results_pyhmmer = run_pyhmmer_envhogs(
+    #     db_dir, out_dir, args.threads, gene_predictor, args.evalue
+    # )
+    logger.info("Running hhsuite on EnVhogs.")
+
+    run_hhindex_hhblits(out_dir, gene_predictor, db_dir, args.threads, logdir)
 
 
     #################################################
@@ -313,7 +317,7 @@ def main():
     pharok.inphared_top_hits()
 
     # delete tmp files
-    remove_post_processing_files(out_dir, gene_predictor, args.meta)
+    # remove_post_processing_files(out_dir, gene_predictor, args.meta)
 
     # Determine elapsed time
     elapsed_time = time.time() - start_time

@@ -53,6 +53,7 @@ setup(
         "bin/util.py",
         "bin/version.py",
         "bin/create_custom_hmm.py",
+        "bin/run_hhsuite.py"
     ],
     packages=["pharokka_runner"],
     package_dir=dict(pharokka_runner="bin"),

@@ -243,6 +243,7 @@ class Pharok:
                 " ", expand=True)
         print(merged_df['gene_for_envhog_merge'])
         print(self.hhsuite_tophits_df['gene_for_envhog_merge'])
+        print(self.hhsuite_tophits_df
         merged_df = merged_df.merge(self.hhsuite_tophits_df, on="gene_for_envhog_merge", how="left")
         print(merged_df)
         

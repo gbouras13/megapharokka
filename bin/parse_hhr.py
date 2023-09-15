@@ -4,21 +4,21 @@ Function to parse the hhsuite output and returns the tophit hhsuite dataframe
 import pandas as pd
 import os
 
-def process_hhsuite_results(out_dir, eval):
+def process_hhsuite_results(out_dir, ev):
     """
     wraps hhparse
     :param out_dir: output directory
-    :param eval: evalue threshold
+    :param ev: evalue threshold
     :return: tophits_df tophit for every gene if it exists
     """
     
     target_db_dir = os.path.join(out_dir, "hhsuite_target_dir")
     hhresult_file =  os.path.join(target_db_dir, "results_your_seq_VS_EnVhog.ffdata")
 
-    tophits_df = hhparse(hhresult_file) # verbose
+    tophits_df = hhparse(hhresult_file, ev) # verbose
     return  tophits_df
 
-def hhparse(hhresult_file):
+def hhparse(hhresult_file, ev):
         
     # Initialize lists to store data
     envhog_list = []
@@ -82,8 +82,9 @@ def hhparse(hhresult_file):
         'hhsuite_Similarity': similarity_list
     })
 
-    tophits_df = tophits_df[tophits_df['hhsuite_evalue'] < eval]
-    
+    # only keep evalue < evalue
+    tophits_df = tophits_df[tophits_df['hhsuite_evalue'] < ev]
+ 
 
     return tophits_df
 

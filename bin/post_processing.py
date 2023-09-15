@@ -239,6 +239,9 @@ class Pharok:
         # Adds hhsuites results tophits
         merged_df = merged_df.merge(self.hhsuite_tophits_df, on="gene", how="left")
 
+        ###############
+        # add annotation
+        ###############
 
         # read in envhog annotaion file
         envhog_annot_df = pd.read_csv(
@@ -2482,82 +2485,3 @@ def check_and_create_directory(directory):
 
 
 
-
-
-
-# def process_hhsuite_results(out_dir, pyhmmer_results_dict):
-#     """
-#     Gets CDS using pyrodigal_gv
-#     :param filepath_in: input filepath
-#     :param out_dir: output directory
-#     :param threads: int
-#     :return:
-#     """
-    
-#     # define the amino acid FASTA
-#     amino_acid_fasta_name = gene_predictor + "_aas_tmp.fasta"
-#     amino_acid_fasta_file = os.path.join(out_dir, amino_acid_fasta_name)
-
-
-#     # define target db
-#     target_db_dir = os.path.join(out_dir, "hhsuite_target_dir")
-#     tsv_prefix = os.path.join(target_db_dir, 'hhsuite_tsv_file.ff') 
-
-#     logger.info("Making target hhsuite db")
-#     # make dir for target db
-#     if os.path.isdir(target_db_dir) == False:
-#          os.mkdir(target_db_dir)
-
-
-#      # indexes the file 
-#      #can't pass curly brackets to subprocess so need to run using os
-
-#     combined_index_data = ''.join((tsv_prefix, 'data'))
-#     combined_index_index = ''.join((tsv_prefix, 'index'))
-
-#     ### hhblits
-
-#     tsv_file = os.path.join(target_db_dir, 'hhsuite_tsv_file')
-#     db = os.path.join(db_dir, "EnVhog")
-#     results_targets = os.path.join(target_db_dir, "results_your_seq_VS_EnVhog")
-#     results_tsv = os.path.join(target_db_dir, "results_tsv_file")
-
-
-
-
-def process_hhsuite_results(out_dir):
-    """
-    Gets CDS using pyrodigal_gv
-    :param filepath_in: input filepath
-    :param out_dir: output directory
-    :param threads: int
-    :return:
-    """
-    
-    target_db_dir = os.path.join(out_dir, "hhsuite_target_dir")
-    hhresult_file =  os.path.join(target_db_dir, "results_your_seq_VS_EnVhog.ffdata")
-
-    df = hhparse(hhresult_file) # verbose
-    print(df)
-
-
-
-    logger.info("Processing hhsuite output")
-    col_list = ["gene_hmm", "phrog_hmm", "seqIdentity_hmm", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "eVal_hmm", "alnScore_hmm"] 
-   
-   
-    hhsuite_df = pd.read_csv(hhsuite_file, delimiter= '\t', index_col=False , names=col_list) 
-    genes = hhsuite_df.gene_hmm.unique()
-    # remove nan
-    genes = [x for x in genes if str(x) != 'nan']
-    tophits = []
-    for gene in genes:
-        tmp_df = hhsuite_df.loc[hhsuite_df['gene_hmm'] == gene].sort_values('eVal_hmm').reset_index(drop=True).iloc[0]
-        tophits.append([tmp_df.phrog_hmm, tmp_df.gene_hmm, tmp_df.alnScore_hmm, tmp_df.seqIdentity_hmm, tmp_df.eVal_hmm])
-    tophits_hmm__df = pd.DataFrame(tophits, columns=['phrog_hmm', 'gene_hmm', 'alnScore_hmm', 'seqIdentity_hmm', 'eVal_hmm'])
-    # filter from 0 to end for savings
-    tophits_hmm__df[['spl','ind']] = tophits_hmm__df['gene_hmm'].str.split('delimiter',expand=True)
-    tophits_hmm__df[['ind']] = tophits_hmm__df[['ind']].astype(int)
-    tophits_hmm__df = tophits_hmm__df.sort_values(by=['ind']).drop(columns = ['spl', 'ind'])
-    tophits_hmm__df.to_csv(os.path.join(out_dir, "top_hits_hhsuite.tsv"), sep="\t", index=False)
-    

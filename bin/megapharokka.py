@@ -23,7 +23,7 @@ from processes import (concat_phanotate_meta, concat_trnascan_meta,
                        run_trnascan_meta, split_input_fasta, translate_fastas)
 from util import count_contigs, get_version
 from run_hhsuite import run_hhindex_hhblits
-from post_processing import process_hhsuite_results
+from parse_hhr import process_hhsuite_results
 
 
 def main():

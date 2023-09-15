@@ -243,7 +243,7 @@ class Pharok:
                 " ", expand=True)
 
         merged_df = merged_df.merge(self.hhsuite_tophits_df, on="gene_for_envhog_merge", how="left")
-        pyrodigal_gv_gff = pyrodigal_gv_gff.drop(
+        merged_df = merged_df.drop(
                 columns=[
                     "gene_for_envhog_merge",
                     "rubbish"

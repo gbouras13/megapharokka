@@ -31,12 +31,12 @@ def hhparse(hhresult_file):
     
                 # Extract data from subsequent lines until the next '>'
                 data = lines[i + 1].split()  # Split the line to extract the data
-                probab = float(data[1].split('=')[1])
-                evalue = float(data[2].split('=')[1])
-                score = float(data[3].split('=')[1])
-                aligned_cols = int(data[4].split('=')[1])
-                identities = float(data[5].split('=')[1].rstrip('%'))
-                similarity = float(data[6].split('=')[1])
+                probab = float(data[0].split('=')[1])
+                evalue = float(data[1].split('=')[1])
+                score = float(data[2].split('=')[1])
+                aligned_cols = int(data[3].split('=')[1])
+                identities = float(data[4].split('=')[1].rstrip('%'))
+                similarity = float(data[5].split('=')[1])
             
                 probab_list.append(probab)
                 evalue_list.append(evalue)
@@ -45,7 +45,7 @@ def hhparse(hhresult_file):
                 identities_list.append(identities)
                 similarity_list.append(similarity)
     
-                i += 4  # Move to the next line after the '>'
+                i += 1  # Move to the next line after the '>'
             else:
                 i += 1
     

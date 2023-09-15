@@ -2536,7 +2536,7 @@ def process_hhsuite_results(out_dir):
     target_db_dir = os.path.join(out_dir, "hhsuite_target_dir")
     hhresult_file =  os.path.join(target_db_dir, "results_your_seq_VS_EnVhog.ffdata")
 
-    df = hhparse(hhresult_file, True) # verbose
+    df = hhparse(hhresult_file) # verbose
     print(df)
 
 

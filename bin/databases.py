@@ -90,21 +90,21 @@ def check_db_installation(db_dir):
     for file_name in ENVHOG_NAMES:
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:
-            logger.info("ENVHOGs Databases are missing.")
+            logger.info(f"ENVHOGs Database file {path} is missing.")
             downloaded_flag = False
             break
     # VFDB
     for file_name in VFDB_DB_NAMES:
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:
-            logger.info("VFDB Databases are missing.")
+            logger.info(f"VFDB Database file {path} is missing.")
             downloaded_flag = False
             break
     # CARD
     for file_name in CARD_DB_NAMES:
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:
-            logger.info("CARD Databases are missing.")
+            logger.info(f"CARD Databases file {path} is missing.")
             downloaded_flag = False
             break
     # annot.tsv

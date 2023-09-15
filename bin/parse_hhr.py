@@ -83,6 +83,7 @@ def hhparse(hhresult_file, ev):
     })
 
     # only keep evalue < evalue
+    print(tophits_df['hhsuite_evalue'])
     tophits_df = tophits_df[tophits_df['hhsuite_evalue'] < float(ev)]
  
 

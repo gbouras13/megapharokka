@@ -237,10 +237,12 @@ class Pharok:
         ####################
 
         # Adds hhsuites results tophits
-        print(merged_df)
-        print(self.hhsuite_tophits_df)
-        print(merged_df['gene'])
-        print(self.hhsuite_tophits_df['gene'])
+
+
+        merged_df[["gene_for_envhog_merge", "rubbish"]] = merged_df["gene"].str.split(
+                " ", expand=True)
+        print(merged_df['gene_for_envhog_merge'])
+        print(self.hhsuite_tophits_df['gene_for_envhog_merge'])
         merged_df = merged_df.merge(self.hhsuite_tophits_df, on="gene", how="left")
         print(merged_df)
         

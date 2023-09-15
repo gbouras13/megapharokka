@@ -72,7 +72,7 @@ def hhparse(hhresult_file):
     # Create a DataFrame
     tophits_df = pd.DataFrame({
         'envhog': envhog_list,
-        'gene': gene_list,
+        'gene_for_envhog_merge': gene_list,
         'hhsuite_Prob': probab_list,
         'hhsuite_evalue': evalue_list,
         'hhsuite_Score': score_list,

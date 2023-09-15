@@ -239,6 +239,8 @@ class Pharok:
         # Adds hhsuites results tophits
         print(merged_df)
         print(self.hhsuite_tophits_df)
+        print(merged_df['enhvog'])
+        print(self.hhsuite_tophits_df['enhvog'])
         merged_df = merged_df.merge(self.hhsuite_tophits_df, on="gene", how="left")
         print(merged_df)
         

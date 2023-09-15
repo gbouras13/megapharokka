@@ -34,7 +34,11 @@ from post_processing import remove_directory
 # to hold information about the different DBs
 
 
-ENVHOG_NAMES = ["enVhogs.h3m", "envhogs_annot_140923.tsv"]
+#ENVHOG_NAMES = ["enVhogs.h3m", "envhogs_annot_140923.tsv"]
+ENVHOG_NAMES = ["EnVhog_hhm.ffdata", "EnVhog_hhm.ffindex",
+                "EnVhog_a3m.ffdata", "EnVhog_a3m.ffindex",
+                "EnVhog_cs219.ffdata", "EnVhog_cs291.ffindex"]
+
 
 VFDB_DB_NAMES = [
     "vfdb",
@@ -82,7 +86,7 @@ def instantiate_dir(db_dir):
 
 def check_db_installation(db_dir):
     downloaded_flag = True
-    # PHROGS files
+    # ENVHOG files
     for file_name in ENVHOG_NAMES:
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:

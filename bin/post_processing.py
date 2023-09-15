@@ -241,11 +241,15 @@ class Pharok:
 
         merged_df[["gene_for_envhog_merge", "rubbish"]] = merged_df["gene"].str.split(
                 " ", expand=True)
-        print(merged_df['gene_for_envhog_merge'])
-        print(self.hhsuite_tophits_df['gene_for_envhog_merge'])
-        print(self.hhsuite_tophits_df)
+
         merged_df = merged_df.merge(self.hhsuite_tophits_df, on="gene_for_envhog_merge", how="left")
-        print(merged_df)
+        pyrodigal_gv_gff = pyrodigal_gv_gff.drop(
+                columns=[
+                    "gene_for_envhog_merge",
+                    "rubbish"
+                ]
+            )
+
         
 
         ###############

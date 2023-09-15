@@ -16,6 +16,7 @@ def hhparse(hhresult_file):
     
     
     # Read the file line by line
+    current_gene="gene"
     with open(hhresult_file, 'r') as file:
         lines = file.readlines()
         i = 0
@@ -24,26 +25,30 @@ def hhparse(hhresult_file):
                 # Extract 'envhog' and 'gene' values from the line
                 envhog = lines[i].strip().split('>')[1]
                 gene = lines[i + 3].split()[1] if i + 3 < len(lines) else None  # Assuming gene value is 3 lines after '>'
-            
-                # Add 'envhog' and 'gene' to lists
-                envhog_list.append(envhog)
-                gene_list.append(gene)
-    
-                # Extract data from subsequent lines until the next '>'
-                data = lines[i + 1].split()  # Split the line to extract the data
-                probab = float(data[0].split('=')[1])
-                evalue = float(data[1].split('=')[1])
-                score = float(data[2].split('=')[1])
-                aligned_cols = int(data[3].split('=')[1])
-                identities = float(data[4].split('=')[1].rstrip('%'))
-                similarity = float(data[5].split('=')[1])
-            
-                probab_list.append(probab)
-                evalue_list.append(evalue)
-                score_list.append(score)
-                aligned_cols_list.append(aligned_cols)
-                identities_list.append(identities)
-                similarity_list.append(similarity)
+
+                if gene != current_gene:
+                    # for the next step of the loop, make current_gene
+                    current_gene = gene
+                    
+                    # Add 'envhog' and 'gene' to lists
+                    envhog_list.append(envhog)
+                    gene_list.append(gene)
+        
+                    # Extract data from subsequent lines until the next '>'
+                    data = lines[i + 1].split()  # Split the line to extract the data
+                    probab = float(data[0].split('=')[1])
+                    evalue = float(data[1].split('=')[1])
+                    score = float(data[2].split('=')[1])
+                    aligned_cols = int(data[3].split('=')[1])
+                    identities = float(data[4].split('=')[1].rstrip('%'))
+                    similarity = float(data[5].split('=')[1])
+                
+                    probab_list.append(probab)
+                    evalue_list.append(evalue)
+                    score_list.append(score)
+                    aligned_cols_list.append(aligned_cols)
+                    identities_list.append(identities)
+                    similarity_list.append(similarity)
     
                 i += 1  # Move to the next line after the '>'
             else:

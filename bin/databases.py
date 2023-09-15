@@ -35,7 +35,7 @@ from post_processing import remove_directory
 
 
 #ENVHOG_NAMES = ["enVhogs.h3m", "envhogs_annot_140923.tsv"]
-ENVHOG_NAMES = ["EnVhog_hhm.ffdata", "EnVhog_hhm.ffindex",
+ENVHOG_NAMES = ["EnVhog_hmm.ffdata", "EnVhog_hmm.ffindex",
                 "EnVhog_a3m.ffdata", "EnVhog_a3m.ffindex",
                 "EnVhog_cs219.ffdata", "EnVhog_cs219.ffindex"]
 

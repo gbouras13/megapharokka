@@ -13,6 +13,7 @@ from Bio.SeqUtils import GC
 from loguru import logger
 from processes import convert_gff_to_gbk
 from util import remove_directory, remove_file, touch_file
+from parse_hhr import hhparse
 
 pd.options.mode.chained_assignment = None
 
@@ -2523,7 +2524,7 @@ def check_and_create_directory(directory):
 
 
 
-def process_hhsuite_results(out_dir, pyhmmer_results_dict):
+def process_hhsuite_results(out_dir):
     """
     Gets CDS using pyrodigal_gv
     :param filepath_in: input filepath
@@ -2531,9 +2532,14 @@ def process_hhsuite_results(out_dir, pyhmmer_results_dict):
     :param threads: int
     :return:
     """
-
+    
     target_db_dir = os.path.join(out_dir, "hhsuite_target_dir")
-    hhsuite_file =  os.path.join(target_db_dir, "results_tsv_file.ffdata")
+    hhresult_file =  os.path.join(target_db_dir, "results_your_seq_VS_EnVhog.ffdata")
+
+    df = hhparse(hhresult_file, False)
+    print(df)
+
+
 
     logger.info("Processing hhsuite output")
     col_list = ["gene_hmm", "phrog_hmm", "seqIdentity_hmm", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "eVal_hmm", "alnScore_hmm"] 

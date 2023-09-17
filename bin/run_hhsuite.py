@@ -4,7 +4,7 @@ from loguru import logger
 
 
 
-def run_hhindex_hhblits(out_dir, gene_predictor,db_dir, threads, logdir):
+def run_hhindex_hhblits(out_dir, gene_predictor,db_dir, threads, evalue, logdir):
     """
     Gets CDS using pyrodigal_gv
     :param filepath_in: input filepath
@@ -65,7 +65,7 @@ def run_hhindex_hhblits(out_dir, gene_predictor,db_dir, threads, logdir):
         tool="hhblits_omp",
         input="",
         output="",
-        params=f" -i  {tsv_file} -d {db} -cpu {threads} -M first -n 1 -o {results_targets} -blasttab {results_tsv} ",
+        params=f" -i  {tsv_file} -d {db} -cpu {threads} -M first -n 1 -o {results_targets} -blasttab {results_tsv} -e {evalue} ",
         logdir=logdir,
         outfile="",
     )

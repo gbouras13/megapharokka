@@ -225,7 +225,7 @@ def main():
 
     logger.info("Running hhsuite on EnVhogs.")
 
-    run_hhindex_hhblits(out_dir, gene_predictor, db_dir, args.threads, logdir)
+    run_hhindex_hhblits(out_dir, gene_predictor, db_dir, args.threads, args.evalue, logdir)
 
 
     #################################################

@@ -106,7 +106,7 @@ PHROG_HMM_NAMES = ["all_phrogs.h3m"]
 def instantiate_install(db_dir):
     instantiate_dir(db_dir)
     # check the database is installed
-    logger.info(f"Checking Megapharokka database installation in {db_dir}.")
+    logger.info(f"Checking Megapharokka database installation in {db_dir} directory.")
     check_envhogs_installation(db_dir)
     downloaded_flag = check_db_installation(db_dir)
     if downloaded_flag == True:

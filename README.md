@@ -5,23 +5,12 @@ A fork of Pharokka to handle enVhogs
 
 - [megapharokka](#megapharokka)
 - [Table of Contents](#table-of-contents)
-- [Creation of enVhog HMM profile Databases for use with pyhmmer](#creation-of-envhog-hmm-profile-databases-for-use-with-pyhmmer)
 - [Installing megapharokka](#installing-megapharokka)
+- [Creation of enVhog HMM profile Databases for use with pyhmmer](#creation-of-envhog-hmm-profile-databases-for-use-with-pyhmmer)
 - [Running megapharokka](#running-megapharokka)
 - [Database](#database)
 
 
-# Creation of enVhog HMM profile Databases for use with pyhmmer
-
-See `scripts/notes.sh`
-
-1. Download and untar the tarball (ends up about 60GB).
-2. Extract the a3m files from hhsuite formatted files
-3. Convert s3m to FASTA MSA
-4. Rename MSA to match metadata and remove consensus sequence
-5. Create HMMs with pyHMMER `create_custom_hmm.py` from Pharokka v1.4
-6. Create the filtered tsv with `filter_clusters_tsv.py`
-7. 
 
 # Installing megapharokka
 
@@ -45,15 +34,40 @@ conda activate megapharokka_env
 pip install .
 ```
 
-4. Install `pyrodigal` v3 and `pyrodigal-gv` pre-releases
+* Note: Martin Larralde the creator and maintainer of these tools at EMBL Heidelberg  just made prod releases: `pyrodigal` v3 is required to be compatible with `pyrodigal-gv` v0.1.0
 
-* Martin Larralde the creator and maintainer of these tools at EMBL Heidelberg has not yet made production releases. `pyrodigal` v3 is required to be compatible with `pyrodigal-gv` (essentially he made it in response to an issue in and for Pharokka).
-* When he releases it I will update.
+
+
+# Creation of enVhog HMM profile Databases for use with pyhmmer
+
+See `scripts/notes.sh`
+
+1. Download and untar the tarball (ends up about 60GB).
 
 ```
-pip install -U --pre pyrodigal
-pip install -U --pre pyrodigal-gv
+wget "envhog.u-ga.fr/envhog/EnVhog_HMMs/EnVhog.tar.gz"
+
+# 2. untar the enVhogs
+tar -xzf EnVhog.tar.gz
+
 ```
+
+2. Install pharokka DBs
+
+```
+conda activate megapharokka_env
+# installs DB into MegapharokkaDB directory
+install_databases.py -o MegapharokkaDB
+
+```
+
+3. Copy the file in `envhog_hmm` from the tarball into the MegapharokkaDB
+
+```
+cp envhog_hmm/* MegapharokkaDB
+```
+
+
 
 # Running megapharokka
 

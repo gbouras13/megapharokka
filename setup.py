@@ -54,7 +54,8 @@ setup(
         "bin/version.py",
         "bin/create_custom_hmm.py",
         "bin/run_hhsuite.py",
-        "bin/parse_hhr.py"
+        "bin/parse_hhr.py",
+        "bin/install_databases.py",
     ],
     packages=["pharokka_runner"],
     package_dir=dict(pharokka_runner="bin"),
@@ -92,7 +93,7 @@ setup(
         "alive-progress>=3.0.1",
         "requests>=2.25.1",
         "bcbio-gff >=0.7.0",
-        #"pyrodigal >=3.0.0",
-        #"pyrodigal_gv >= 0.1.0"
+        "pyrodigal >=3.0.0",
+        "pyrodigal_gv >= 0.1.0"
     ],
 )

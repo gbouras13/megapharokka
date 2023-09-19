@@ -944,17 +944,17 @@ class Pharok:
                 )
                 tmrna_df = tmrna_df.drop(columns=["locus_tag"])
 
-            # write header of final gff files
-            with open(os.path.join(self.out_dir, self.prefix + ".gff"), "w") as f:
-                f.write("##gff-version 3\n")
-                for index, row in self.length_df.iterrows():
-                    f.write(
-                        "##sequence-region "
-                        + row["contig"]
-                        + " 1 "
-                        + str(row["length"])
-                        + "\n"
-                    )
+        # write header of final gff files
+        with open(os.path.join(self.out_dir, self.prefix + ".gff"), "w") as f:
+            f.write("##gff-version 3\n")
+            for index, row in self.length_df.iterrows():
+                f.write(
+                    "##sequence-region "
+                    + row["contig"]
+                    + " 1 "
+                    + str(row["length"])
+                    + "\n"
+                )
 
         # combine dfs depending on whether the elements were detected
 

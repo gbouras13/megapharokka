@@ -234,7 +234,7 @@ def main():
         run_minced(input_fasta, out_dir, prefix, logdir)
         run_aragorn(input_fasta, out_dir, prefix, logdir)
 
-    # running mmseqs2 on the 2 CARD and VFDB
+    # # running mmseqs2 on the 2 CARD and VFDB
     # run_mmseqs(
     #     db_dir,
     #     out_dir,

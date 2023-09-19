@@ -2054,6 +2054,10 @@ def create_mmseqs_tophits(out_dir):
         mmseqs_file, delimiter="\t", index_col=False, names=col_list
     )
 
+    # Filter rows where 'envhog' column contains "partial=00"
+    # these cause weird issues with gff to gbk convertion 
+    mmseqs_df = mmseqs_df[~mmseqs_df['envhog'].str.contains("partial=00")]
+
     # optimise the tophits generation
     # Group by 'gene' and find the top hit for each group
     tophits_df = mmseqs_df.groupby('gene').apply(lambda group: group.nsmallest(1, 'mmseqs_eVal')).reset_index(drop=True)

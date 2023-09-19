@@ -234,41 +234,41 @@ def main():
         run_minced(input_fasta, out_dir, prefix, logdir)
         run_aragorn(input_fasta, out_dir, prefix, logdir)
 
-    # # running mmseqs2 on the 2 CARD and VFDB
-    # run_mmseqs(
-    #     db_dir,
-    #     out_dir,
-    #     args.threads,
-    #     logdir,
-    #     gene_predictor,
-    #     args.evalue,
-    #     args.sensitivity,
-    #     db_name="CARD",
-    # )
+    # running mmseqs2 on the 2 CARD and VFDB
+    run_mmseqs(
+        db_dir,
+        out_dir,
+        args.threads,
+        logdir,
+        gene_predictor,
+        args.evalue,
+        args.sensitivity,
+        db_name="CARD",
+    )
+    
+    run_mmseqs(
+        db_dir,
+        out_dir,
+        args.threads,
+        logdir,
+        gene_predictor,
+        args.evalue,
+        args.sensitivity,
+        db_name="VFDB"
+    )
 
-    # run_mmseqs(
-    #     db_dir,
-    #     out_dir,
-    #     args.threads,
-    #     logdir,
-    #     gene_predictor,
-    #     args.evalue,
-    #     args.sensitivity,
-    #     db_name="VFDB"
-    # )
-
-    # # for mmseqs
-    # if envhog_mmseqs is True:
-    #     run_mmseqs(
-    #         db_dir,
-    #         out_dir,
-    #         args.threads,
-    #         logdir,
-    #         gene_predictor,
-    #         args.evalue,
-    #         args.sensitivity,
-    #         db_name="ENVHOG"
-    #     )
+    # for mmseqs
+    if envhog_mmseqs is True:
+        run_mmseqs(
+            db_dir,
+            out_dir,
+            args.threads,
+            logdir,
+            gene_predictor,
+            args.evalue,
+            args.sensitivity,
+            db_name="ENVHOG"
+        )
 
     # pyhmmer
 

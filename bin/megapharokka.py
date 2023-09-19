@@ -174,9 +174,12 @@ def main():
         else:  # pyhmmer will be run
             logger.info("You have specified  --pyhmmer. PyHMMER will be used.")
             envhog_pyhmmer = True
+            envhog_mmseqs = False
     else:  # no pyhmmer
         if args.hhsuite is True:
             logger.info("You have specified  --hhsuite. HHSuite3 will be used.")
+            envhog_hhsuite = True
+            envhog_mmseqs = False
         else:
             logger.info("By default, MMseqs2 will be used.")
 

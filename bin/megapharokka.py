@@ -190,7 +190,6 @@ def main():
     if (
         args.meta == True
         and args.skip_extra_annotations is False
-        and gene_predictor == "phanotate"
     ):
         num_fastas = split_input_fasta(input_fasta, out_dir)
         # will generate split output gffs if split flag is true

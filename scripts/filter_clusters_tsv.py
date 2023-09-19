@@ -71,6 +71,14 @@ def main():
     # replace 'phrog_33' with 33
     df_selected["phrog"] = df_selected["phrog"].str.replace("phrog_", "", 1)
 
+
+    # Create a boolean mask to identify non-NA values in the 'phrog' column
+    mask = ~df_selected['phrog'].isna()
+
+    # Use the mask to fill NaN values in the 'phrog' column with 'hypothetical protein'
+    df_selected.loc[mask, 'phrog'] = df_selected.loc[mask, 'phrog'].fillna('hypothetical protein')
+
+    # all NAs
     df_selected.fillna("No_PHROG_for_ENVHOG", inplace=True)
 
     # Save the selected columns to a new TSV file

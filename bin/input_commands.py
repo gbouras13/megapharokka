@@ -102,6 +102,12 @@ def get_input():
         "--mmseqs2", help="Runs MMSeqs2 on EnVhogs.", action="store_true"
     )
     parser.add_argument(
+        "--sensitivity", 
+        help="sensitivity flag for mmseqs2 on EnVhogs.",
+        action="store",
+        default="8.5",
+    )
+    parser.add_argument(
         "--pyhmmer", help="Runs pyhmmer on EnVhogs.", action="store_true"
     )
     parser.add_argument(

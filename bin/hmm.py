@@ -8,6 +8,7 @@ from pyhmmer.plan7 import HMM, HMMFile
 # from itertools import chain
 
 
+
 def run_pyhmmer_envhogs(db_dir, out_dir, threads, gene_predictor, evalue):
     """
     Runs PyHMMER on envhogs

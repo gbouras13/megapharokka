@@ -242,8 +242,10 @@ def main():
         logdir,
         gene_predictor,
         args.evalue,
+        args.sensitivity,
         db_name="CARD",
     )
+
     run_mmseqs(
         db_dir,
         out_dir,
@@ -251,7 +253,8 @@ def main():
         logdir,
         gene_predictor,
         args.evalue,
-        db_name="VFDB",
+        args.sensitivity,
+        db_name="VFDB"
     )
 
     # for mmseqs
@@ -263,7 +266,8 @@ def main():
             logdir,
             gene_predictor,
             args.evalue,
-            db_name="ENVHOG",
+            args.sensitivity,
+            db_name="ENVHOG"
         )
 
     # pyhmmer

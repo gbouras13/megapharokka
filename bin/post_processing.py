@@ -2053,41 +2053,21 @@ def create_mmseqs_tophits(out_dir):
     mmseqs_df = pd.read_csv(
         mmseqs_file, delimiter="\t", index_col=False, names=col_list
     )
-    # get list of genes
-    genes = mmseqs_df.gene.unique()
 
-    # instantiate tophits list
-    tophits = []
+    # optimise the tophits generation
+    # Group by 'gene' and find the top hit for each group
+    tophits_df = mmseqs_df.groupby('gene').apply(lambda group: group.nsmallest(1, 'mmseqs_eVal')).reset_index(drop=True)
 
-    for gene in genes:
-        print(gene)
-        tmp_df = (
-            mmseqs_df.loc[mmseqs_df["gene"] == gene]
-            .sort_values("mmseqs_eVal")
-            .reset_index(drop=True)
-            .loc[0]
-        )
-        tophits.append(
-            [
-                tmp_df.envhog,
-                tmp_df.gene,
-                tmp_df.mmseqs_alnScore,
-                tmp_df.mmseqs_seqIdentity,
-                tmp_df.mmseqs_eVal,
-            ]
-        )
+    # Reorder columns as needed
+    tophits_df = tophits_df[[
+        "envhog",
+        "gene",
+        "mmseqs_alnScore",
+        "mmseqs_seqIdentity",
+        "mmseqs_eVal",
+    ]]
 
-    # create tophits df
-    tophits_df = pd.DataFrame(
-        tophits,
-        columns=[
-            "envhog",
-            "gene",
-            "mmseqs_alnScore",
-            "mmseqs_seqIdentity",
-            "mmseqs_eVal",
-        ],
-    )
+
     tophits_df.to_csv(
         os.path.join(out_dir, "top_hits_mmseqs.tsv"), sep="\t", index=False
     )

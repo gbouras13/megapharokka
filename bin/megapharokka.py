@@ -378,7 +378,7 @@ def main():
     pharok.inphared_top_hits()
 
     # delete tmp files
-    # remove_post_processing_files(out_dir, gene_predictor, args.meta)
+    remove_post_processing_files(out_dir, gene_predictor, args.meta)
 
     # Determine elapsed time
     elapsed_time = time.time() - start_time

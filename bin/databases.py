@@ -163,9 +163,7 @@ def check_envhogs_installation_annot(db_dir):
     for file_name in ENVHOG_NAMES_ANNOT:
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:
-            logger.warning(f"ENVHOGs Annotation Database file {path} is missing.")
-            logger.warning("Please copy it in after this is downloaded :)")
-
+            logger.error(f"ENVHOGs Annotation Database file {path} is missing. Please copy it in!")
 
 def check_envhogs_installation_hhsuite(db_dir):
     # ENVHOG files
@@ -173,7 +171,7 @@ def check_envhogs_installation_hhsuite(db_dir):
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:
             logger.warning(f"ENVHOGs HHsuite Database file {path} is missing.")
-            logger.warning("Please copy it in after this is downloaded :)")
+            logger.warning("Please copy it in if you want to use --hhsuite :)")
 
 
 def check_envhogs_installation_pyhmmer(db_dir):
@@ -182,7 +180,7 @@ def check_envhogs_installation_pyhmmer(db_dir):
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:
             logger.warning(f"ENVHOGs PyHMMER Database file {path} is missing.")
-            logger.warning("Please copy it in after this is downloaded :)")
+            logger.warning("Please copy it in if you want to use --pyhmmer :)")
 
 
 def check_envhogs_installation_mmseqs2(db_dir):
@@ -191,7 +189,7 @@ def check_envhogs_installation_mmseqs2(db_dir):
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:
             logger.warning(f"ENVHOGs MMSeqs2 Database file {path} is missing.")
-            logger.warning("Please copy it in after this is downloaded :)")
+            logger.warning("Please copy it in if you want to use --mmseqs2  :)")
 
 
 def check_db_installation(db_dir):

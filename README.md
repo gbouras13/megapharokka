@@ -5,23 +5,16 @@ A fork of Pharokka to handle enVhogs
 
 - [megapharokka](#megapharokka)
 - [Table of Contents](#table-of-contents)
-- [Creation of enVhog HMM profile Databases for use with pyhmmer](#creation-of-envhog-hmm-profile-databases-for-use-with-pyhmmer)
+- [Outline](#outline)
 - [Installing megapharokka](#installing-megapharokka)
 - [Running megapharokka](#running-megapharokka)
 - [Database](#database)
 
 
-# Creation of enVhog HMM profile Databases for use with pyhmmer
+# Outline
 
-See `scripts/notes.sh`
-
-1. Download and untar the tarball (ends up about 60GB).
-2. Extract the a3m files from hhsuite formatted files
-3. Convert s3m to FASTA MSA
-4. Rename MSA to match metadata and remove consensus sequence
-5. Create HMMs with pyHMMER `create_custom_hmm.py` from Pharokka v1.4
-6. Create the filtered tsv with `filter_clusters_tsv.py`
-7. 
+* Megapharokka will Run MMSeqs2 (default of `--mmseqs2`), PyHMMER (`--pyhmmer`) or HHsuite (`--hhsuite`) against appropriately formatted ENVHOG databases.
+* Documentation in [Database](#database).
 
 # Installing megapharokka
 
@@ -41,44 +34,52 @@ conda activate megapharokka_env
 
 3. Install `megapharokka` and most python dependecies with `pip`
 
+* Note: Martin Larralde the creator and maintainer of these tools at EMBL Heidelberg  just made production releases: `pyrodigal` v3 is required to be compatible with `pyrodigal-gv` v0.1.0
+
 ```
 pip install .
 ```
 
-4. Install `pyrodigal` v3 and `pyrodigal-gv` pre-releases
-
-* Martin Larralde the creator and maintainer of these tools at EMBL Heidelberg has not yet made production releases. `pyrodigal` v3 is required to be compatible with `pyrodigal-gv` (essentially he made it in response to an issue in and for Pharokka).
-* When he releases it I will update.
-
-```
-pip install -U --pre pyrodigal
-pip install -U --pre pyrodigal-gv
-```
 
 # Running megapharokka
 
-* `-m` meta mode
-* `-s` creates split directories for your contig fastas, gffs and gbks
+* Megapharokka will Run MMSeqs2 (default of `--mmseqs2`) or PyHMMER (`--pyhmmer`) or HHsuite (`--hhsuite`) against appropriately formatted ENVHOG databases.
+* `--skip_extra_annotations` will skip tRNAscan-SE, MINced and Aragorn
+* Run `-m` meta mode (now irrelevant as we are not splitting files but indicate anyway).
+* `-s` creates split directories for your contig fastas, gffs and gbks.
 * You can also use `--dnaapler` to reorient contigs to begin with the large terminase subunit. Wouldn't recommend unless you know the contigs are complete.
 
 ```
 threads=8
-megapharokka.py -i input.fasta -o output_dir -t $threads  -d envhogs_db -g 'prodigal-gv' -m -s -f 
+# mmseqs2
+megapharokka.py -i input.fasta -o output_dir -t $threads  -d envhogs_db -g 'prodigal-gv' --mmseqs2 -m -s -f  --skip_extra_annotations
+# pyhmmer
+megapharokka.py -i input.fasta -o output_dir -t $threads  -d envhogs_db -g 'prodigal-gv' --pyhmmer -m -s -f  --skip_extra_annotations
+# hhsuite
+megapharokka.py -i input.fasta -o output_dir -t $threads  -d envhogs_db -g 'prodigal-gv' --hhsuite -m -s -f  --skip_extra_annotations
 ```
 
 # Database
 
-Database directory required the usual VFDB, CARD and INPHARED files from Pharokka v1.4.0.
+Database directory requires the usual VFDB, CARD and INPHARED files from Pharokka v1.4.0.
 
-It also requires `enVhogs.h3m` and `envhogs_annot_140923.tsv`.
+You can install this with 
 
-It can also work on an enVhogs.h3m file that is a subset of all enVhogs.
+```
+install_databases.py -d megapharokka_db
+```
 
+It also requires ENVHOG database files:
+
+* `envhogs_annot_140923.tsv` for annotation.
+* `enVhogs.h3m` with `--pyhmmer`
+* `EnVhog_consensus` MMSeqs2 database with `--mmseqs2`
+* `EnVhog_hmm.ffdata`, `EnVhog_hmm.ffindex`, `EnVhog_a3m.ffdata`, `EnVhog_a3m.ffindex`, `EnVhog_cs219.ffdata`, `EnVhog_cs219.ffindex`, hhsuite database with `--hhsuite`
 
 
 ```
-usage: megapharokka.py [-h] [-i INFILE] [-o OUTDIR] [-d DATABASE] [-t THREADS] [-f] [-p PREFIX] [-l LOCUSTAG] [-g GENE_PREDICTOR] [-m] [-s]
-                       [-c CODING_TABLE] [-e EVALUE] [--dnaapler] [-V] [--citation]
+usage: megapharokka.py [-h] [-i INFILE] [-o OUTDIR] [-d DATABASE] [-t THREADS] [-f] [-p PREFIX] [-l LOCUSTAG] [-g GENE_PREDICTOR] [-m] [-s] [-c CODING_TABLE] [-e EVALUE] [--dnaapler] [--hhsuite]
+                       [--mmseqs2] [--pyhmmer] [--skip_extra_annotations] [-V] [--citation]
 
 megapharokka: fast phage annotation program with enVhogs
 
@@ -98,7 +99,7 @@ options:
   -l LOCUSTAG, --locustag LOCUSTAG
                         User specified locus tag for the gff/gbk files. This is not required. A random locus tag will be generated instead.
   -g GENE_PREDICTOR, --gene_predictor GENE_PREDICTOR
-                        User specified gene predictor. Use "-g phanotate" or "-g prodigal". 
+                        User specified gene predictor. Use "-g phanotate" or "-g prodigal" or "-g prodigal-gv". 
                         Defaults to phanotate (not required unless prodigal is desired).
   -m, --meta            meta mode for metavirome input samples
   -s, --split           split mode for metavirome samples. -m must also be specified. 
@@ -109,6 +110,11 @@ options:
                         E-value threshold for MMseqs2 database PHROGs, VFDB and CARD and PyHMMER PHROGs database search. Defaults to 1E-05.
   --dnaapler            Runs dnaapler to automatically re-orient all contigs to begin with terminase large subunit if found. 
                         Recommended over using '--terminase'.
+  --hhsuite             Runs hhsuite on EnVhogs.
+  --mmseqs2             Runs MMSeqs2 on EnVhogs.
+  --pyhmmer             Runs pyhmmer on EnVhogs.
+  --skip_extra_annotations
+                        Skips tRNAscan-se, MINced and Aragorn.
   -V, --version         Print pharokka Version
   --citation            Print pharokka Citation
 ```

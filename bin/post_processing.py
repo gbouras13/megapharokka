@@ -2036,8 +2036,7 @@ def create_mmseqs_tophits(out_dir):
 
     ##mmseqs
     mmseqs_file = os.path.join(out_dir, "mmseqs_results.tsv")
-    logger.info("Processing mmseqs2 outputs.")
-    logger.info("Processing ENVHOGs output.")
+    logger.info("Processing ENVHOGs MMseqs2 output.")
     col_list = [
         "envhog",
         "gene",
@@ -2061,6 +2060,7 @@ def create_mmseqs_tophits(out_dir):
     tophits = []
 
     for gene in genes:
+        print(gene)
         tmp_df = (
             mmseqs_df.loc[mmseqs_df["gene"] == gene]
             .sort_values("mmseqs_eVal")

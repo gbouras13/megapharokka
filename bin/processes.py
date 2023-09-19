@@ -610,7 +610,7 @@ def run_trna_scan(filepath_in, threads, out_dir, logdir):
 
 def run_mmseqs(db_dir, out_dir, threads, logdir, gene_predictor, evalue, sensitivity, db_name ):
     """
-    Runs mmseqs2 on phrogs
+    Runs mmseqs2 
     :param db_dir: database path
     :param out_dir: output directory
     :param logger: logger

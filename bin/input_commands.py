@@ -62,7 +62,7 @@ def get_input():
         "--gene_predictor",
         action="store",
         help='User specified gene predictor. Use "-g phanotate" or "-g prodigal" or "-g prodigal-gv". \nDefaults to phanotate (not required unless prodigal is desired).',
-        default="phanotate",
+        default="prodigal-gv",
     )
     parser.add_argument(
         "-m",

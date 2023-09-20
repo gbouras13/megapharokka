@@ -32,12 +32,12 @@ A fork of Pharokka to handle enVhogs
 
 Overall, it is clear that `megapharokka` with `--mmseqs2` oon ENVHOGs is more sensitive than regular `-pharokka` on PHROGs even with `--fast` (pyhmmer). 
 
-| 673 crAss-like genomes from Yutin et al., 2021 | `megapharokka --mmseqs2 --sensitivity 4`| `megapharokka --mmseqs2 --sensitivity 3`  | `pharokka v1.5.0 mmseqs2`| `pharokka v1.5.0 --fast (pyhmmer)` |
-|------------------------------------------------|------------------------------|----------------------------------|--------------------|-------------|
-| Time (min)                                     | 25.21                       | 16.73                        | 17.43             | 61.73   |
-| CDS                                            | 74980                       | 74980                        | 74980              | 74980   |
-| Annotated Function CDS                         | 17724                         | 17540                         | 10131              | 16357   |
-| Unknown Function CDS                           | 57256                       | 57440                        | 64849              | 58623   |
+| 673 crAss-like genomes from Yutin et al., 2021 | `megapharokka --mmseqs2 --sensitivity 4`| `megapharokka --mmseqs2 --sensitivity 3`  |`megapharokka --mmseqs2 --sensitivity 2`  | `pharokka v1.5.0 mmseqs2`| `pharokka v1.5.0 --fast (pyhmmer)` |
+|------------------------------------------------|------------------------------|---------------------|-------------|--------------------|-------------|
+| Time (min)                                     | 25.21                       | 16.73  |     8.23                 | 17.43             | 61.73   |
+| CDS                                            | 74980                       | 74980 |      74980                 | 74980              | 74980   |
+| Annotated Function CDS                         | 17724                         | 17540|          17267               | 10131              | 16357   |
+| Unknown Function CDS                           | 57256                       | 57440   |            57713       | 64849              | 58623   |
 
 # Installing megapharokka
 

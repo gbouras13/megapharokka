@@ -188,8 +188,7 @@ def check_envhogs_installation_mmseqs2(db_dir):
     for file_name in ENVHOG_NAMES_MMSEQS2:
         path = os.path.join(db_dir, file_name)
         if os.path.isfile(path) == False:
-            logger.warning(f"ENVHOGs MMSeqs2 Database file {path} is missing.")
-            logger.warning("Please copy it in if you want to use --mmseqs2  :)")
+            logger.error(f"ENVHOGs MMSeqs2 Database file {path} is missing.")
 
 
 def check_db_installation(db_dir):

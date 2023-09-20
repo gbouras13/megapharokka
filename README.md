@@ -11,25 +11,26 @@ A fork of Pharokka to handle enVhogs
 - [Running megapharokka](#running-megapharokka)
 - [Database](#database)
 
-
 # Outline
 
 * Megapharokka will Run MMSeqs2 (default of `--mmseqs2`), PyHMMER (`--pyhmmer`) or HHsuite (`--hhsuite`) against appropriately formatted ENVHOG databases.
 * Documentation in [Database](#database).
 * I would recommend only using `--mmseqs2`. `--hhsuite` takes too long for large datasets.
 * Need to do some testing for optimal `--sensitivity`.
+* Gene predictor defaults to `-g pyrodigal-gv`.
+* Massive datasets recommended to be run with `--skip_mash`.
 
 # Benchmarking
 
 * All benchmarking was conducted on a Intel® Core™ i7-10700K CPU @ 3.80GHz on a machine running Ubuntu 20.04.6 LTS with `-t 8` threads.
 * The 673 crAss-like contig dataset from Yutin et al was used as a test set. Yutin, N., Benler, S., Shmakov, S.A. et al. Analysis of metagenome-assembled viral genomes from the human gut reveals diverse putative CrAss-like phages with unique genomic features. Nat Commun 12, 1044 (2021) https://doi.org/10.1038/s41467-021-21350-w.
-* `-g prodigal-gv` was used as gene predictor for all options
+* `-g prodigal-gv` was used as gene predictor for all options.
 * `megapharokka` = 2.2M ENVHOGs consensus sequences. 
-* `pharokka` = PHROGs.
+* `pharokka` = 38880 PHROGs.
 * By default, `pharokka` uses MMSeqs2 sensitivity of 8.5.
-* `--hhsuite` for a smaller subset took >20 hours, so ruling that out as a viable option for metagenomes.
+* `--hhsuite` on a small subset took >20 hours, so rule that out as a viable option for metagenomes.
 
-Overall, it is clear that `megapharokka` with `--mmseqs2` oon ENVHOGs is more sensitive than regular `-pharokka` on PHROGs with `--fast` (pyhmmer). 
+Overall, it is clear that `megapharokka` with `--mmseqs2` oon ENVHOGs is more sensitive than regular `-pharokka` on PHROGs even with `--fast` (pyhmmer). 
 
 | 673 crAss-like genomes from Yutin et al., 2021 | `megapharokka --mmseqs2 --sensitivity 4`| `megapharokka --mmseqs2 --sensitivity 3`  | `pharokka v1.5.0 mmseqs2`| `pharokka v1.5.0 --fast (pyhmmer)` |
 |------------------------------------------------|------------------------------|----------------------------------|--------------------|-------------|
@@ -37,9 +38,6 @@ Overall, it is clear that `megapharokka` with `--mmseqs2` oon ENVHOGs is more se
 | CDS                                            | 74980                       | 74980                        | 74980              | 74980   |
 | Annotated Function CDS                         | 17724                         | 17540                         | 10131              | 16357   |
 | Unknown Function CDS                           | 57256                       | 57440                        | 64849              | 58623   |
-
-
-
 
 # Installing megapharokka
 
@@ -59,17 +57,17 @@ conda activate megapharokka_env
 
 3. Install `megapharokka` and most python dependecies with `pip`
 
-* Note: Martin Larralde the creator and maintainer of these tools at EMBL Heidelberg  just made production releases: `pyrodigal` v3 is required to be compatible with `pyrodigal-gv` v0.1.0
+* Note: The inimitable Martin Larralde [@althonos](https://github.com/althonos), the creator and maintainer of these tools at EMBL Heidelberg just made production releases: `pyrodigal` v3 is required to be compatible with `pyrodigal-gv` v0.1.0
 
 ```
 pip install .
 ```
 
-
 # Running megapharokka
 
 * Megapharokka will Run MMSeqs2 (default of `--mmseqs2`) or PyHMMER (`--pyhmmer`) or HHsuite (`--hhsuite`) against appropriately formatted ENVHOG databases.
 * `--skip_extra_annotations` will skip tRNAscan-SE, MINced and Aragorn
+* `--skip_mash` will skip Mash sketch against INPHARED.
 * Run `-m` meta mode (now irrelevant as we are not splitting files but indicate anyway).
 * `-s` creates split directories for your contig fastas, gffs and gbks.
 * You can also use `--dnaapler` to reorient contigs to begin with the large terminase subunit. Wouldn't recommend unless you know the contigs are complete.
@@ -94,11 +92,14 @@ You can install this with
 install_databases.py -d megapharokka_db
 ```
 
-It also requires ENVHOG database files:
+It requires ENVHOG database annotation and MMSeqs2 database:
 
 * `envhogs_annot_140923.tsv` for annotation.
-* `enVhogs.h3m` with `--pyhmmer`
 * `EnVhog_consensus` MMSeqs2 database with `--mmseqs2`
+
+It optionally takens the ENVHOG database files:
+
+* `enVhogs.h3m` with `--pyhmmer`
 * `EnVhog_hmm.ffdata`, `EnVhog_hmm.ffindex`, `EnVhog_a3m.ffdata`, `EnVhog_a3m.ffindex`, `EnVhog_cs219.ffdata`, `EnVhog_cs219.ffindex`, hhsuite database with `--hhsuite`
 
 

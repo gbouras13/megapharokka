@@ -6,6 +6,7 @@ A fork of Pharokka to handle enVhogs
 - [megapharokka](#megapharokka)
 - [Table of Contents](#table-of-contents)
 - [Outline](#outline)
+- [Benchmarking](#benchmarking)
 - [Installing megapharokka](#installing-megapharokka)
 - [Running megapharokka](#running-megapharokka)
 - [Database](#database)
@@ -15,6 +16,30 @@ A fork of Pharokka to handle enVhogs
 
 * Megapharokka will Run MMSeqs2 (default of `--mmseqs2`), PyHMMER (`--pyhmmer`) or HHsuite (`--hhsuite`) against appropriately formatted ENVHOG databases.
 * Documentation in [Database](#database).
+* I would recommend only using `--mmseqs2`. `--hhsuite` takes too long for large datasets.
+* Need to do some testing for optimal `--sensitivity`.
+
+# Benchmarking
+
+* All benchmarking was conducted on a Intel® Core™ i7-10700K CPU @ 3.80GHz on a machine running Ubuntu 20.04.6 LTS with `-t 8` threads.
+* The 673 crAss-like contig dataset from Yutin et al was used as a test set. Yutin, N., Benler, S., Shmakov, S.A. et al. Analysis of metagenome-assembled viral genomes from the human gut reveals diverse putative CrAss-like phages with unique genomic features. Nat Commun 12, 1044 (2021) https://doi.org/10.1038/s41467-021-21350-w.
+* `-g prodigal-gv` was used as gene predictor for all options
+* `megapharokka` = 2.2M ENVHOGs consensus sequences. 
+* `pharokka` = PHROGs.
+* By default, `pharokka` uses MMSeqs2 sensitivity of 8.5.
+* `--hhsuite` for a smaller subset took >20 hours, so ruling that out as a viable option for metagenomes.
+
+Overall, it is clear that `megapharokka` with `--mmseqs2` oon ENVHOGs is more sensitive than regular `-pharokka` on PHROGs with `--fast` (pyhmmer). 
+
+| 673 crAss-like genomes from Yutin et al., 2021 | `megapharokka --mmseqs2 --sensitivity 4`| `megapharokka --mmseqs2 --sensitivity 3`  | `pharokka v1.5.0 mmseqs2`| `pharokka v1.5.0 --fast (pyhmmer)` |
+|------------------------------------------------|------------------------------|----------------------------------|--------------------|-------------|
+| Time (min)                                     | 25.21                       | 16.73                        | 17.43             | 61.73   |
+| CDS                                            | 74980                       | 74980                        | 74980              | 74980   |
+| Annotated Function CDS                         | 17724                         | 17540                         | 10131              | 16357   |
+| Unknown Function CDS                           | 57256                       | 57440                        | 64849              | 58623   |
+
+
+
 
 # Installing megapharokka
 

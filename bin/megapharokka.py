@@ -372,14 +372,18 @@ def main():
     # extract terL
     pharok.extract_terl()
 
-    # run mash
-    logger.info("Finding the closest match for each contig in INPHARED using mash.")
-    # in process.py
-    run_mash_sketch(input_fasta, out_dir, logdir)
-    run_mash_dist(out_dir, db_dir, logdir)
-    # part of the class
-    pharok.inphared_top_hits()
-
+    # skips mash
+    if args.skip_mash is False:
+        logger.info("Finding the closest match for each contig in INPHARED using mash.")
+        # in process.py
+        run_mash_sketch(input_fasta, out_dir, logdir)
+        run_mash_dist(out_dir, db_dir, logdir)
+        # part of the class
+        pharok.inphared_top_hits()
+    else:
+        logger.info(f"You have chosen --skip_mash.")
+        logger.info(f"Skipping finding the closest match for each contig in INPHARED using mash.")
+        
     # delete tmp files
     remove_post_processing_files(out_dir, gene_predictor, args.meta)
 

@@ -114,6 +114,11 @@ def get_input():
         "--skip_extra_annotations",
         help="Skips tRNAscan-se, MINced and Aragorn.",
         action="store_true",
+    ),
+    parser.add_argument(
+        "--skip_mash",
+        help="Skips mash.",
+        action="store_true",
     )
     parser.add_argument(
         "-V",

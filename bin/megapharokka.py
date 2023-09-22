@@ -5,22 +5,24 @@ import shutil
 import sys
 import time
 from pathlib import Path
+
 from databases import check_db_installation
 from hmm import run_pyhmmer_envhogs
 from input_commands import (check_dependencies, get_input, instantiate_dirs,
-                            instantiate_split_output,
-                            validate_fasta, validate_gene_predictor,
-                            validate_meta, 
+                            instantiate_split_output, validate_fasta,
+                            validate_gene_predictor, validate_meta,
                             validate_threads)
 from loguru import logger
+from parse_hhr import process_hhsuite_results
 from post_processing import Pharok, remove_post_processing_files
 from processes import (concat_phanotate_meta, concat_trnascan_meta,
-                       convert_gff_to_gbk, run_aragorn,
-                       run_dnaapler, run_mash_dist, run_mash_sketch,
-                       run_minced, run_mmseqs, run_phanotate,
-                       run_phanotate_fasta_meta, run_phanotate_txt_meta,
-                       run_pyrodigal, run_pyrodigal_gv, run_trna_scan,
-                       run_trnascan_meta, split_input_fasta, translate_fastas)
+                       convert_gff_to_gbk, run_aragorn, run_dnaapler,
+                       run_mash_dist, run_mash_sketch, run_minced, run_mmseqs,
+                       run_phanotate, run_phanotate_fasta_meta,
+                       run_phanotate_txt_meta, run_pyrodigal, run_pyrodigal_gv,
+                       run_trna_scan, run_trnascan_meta, split_input_fasta,
+                       translate_fastas)
+from run_hhsuite import run_hhindex_hhblits
 from util import count_contigs, get_version
 
 
@@ -92,7 +94,6 @@ def main():
             "The database directory was unsuccessfully checked. Please install the databases."
         )
 
-
     # dependencies
     logger.info("Checking dependencies.")
     # output versions
@@ -110,7 +111,7 @@ def main():
     input_fasta = args.infile
 
     # other validations
-    validate_gene_predictor(gene_predictor, False) # genbank false
+    validate_gene_predictor(gene_predictor, False)  # genbank false
     validate_threads(args.threads)
 
     ###################
@@ -122,7 +123,6 @@ def main():
         logger.info(
             "You have chosen to reorient your contigs by specifying --dnaapler. Checking the input."
         )
-
 
         # count contigs
         contig_count = count_contigs(input_fasta)
@@ -147,20 +147,50 @@ def main():
             # copy FASTA to output
             shutil.copy(input_fasta, destination_file)
 
-
     ########
     # mmseqs2 and hmm decisions
     ########
 
+    # envhog_mmseqs by default
+    envhog_mmseqs = True
+    envhog_pyhmmer = False
+    envhog_hhsuite = False
 
-    # by default run both not in meta mode
-    hmm_flag = True
+    if args.mmseqs2 is True:
+        if args.hhsuite is True:
+            logger.error(
+                "You have specified both --mmseqs and --hhsuite. Please choose only 1."
+            )
+        if args.pyhmmer is True:
+            logger.error(
+                "You have specified both --mmseqs and --pyhmmer. Please choose only 1."
+            )
+
+    if args.pyhmmer is True:
+        if args.hhsuite is True:
+            logger.error(
+                "You have specified both --pyhmmer and --hhsuite. Please choose only 1."
+            )
+        else:  # pyhmmer will be run
+            logger.info("You have specified  --pyhmmer. PyHMMER will be used.")
+            envhog_pyhmmer = True
+            envhog_mmseqs = False
+    else:  # no pyhmmer
+        if args.hhsuite is True:
+            logger.info("You have specified  --hhsuite. HHSuite3 will be used.")
+            envhog_hhsuite = True
+            envhog_mmseqs = False
+        else:
+            logger.info("By default, MMseqs2 will be used.")
 
     # validates meta mode
-    validate_meta(input_fasta, args.meta, args.split, False) # genbank is False
+    validate_meta(input_fasta, args.meta, args.split, False)  # genbank is False
 
     # meta mode split input for trnascan and maybe phanotate
-    if args.meta == True:
+    if (
+        args.meta == True
+        and args.skip_extra_annotations is False
+    ):
         num_fastas = split_input_fasta(input_fasta, out_dir)
         # will generate split output gffs if split flag is true
         instantiate_split_output(out_dir, args.split)
@@ -178,7 +208,9 @@ def main():
             run_phanotate(input_fasta, out_dir, logdir)
     elif gene_predictor == "prodigal":
         logger.info("Implementing Prodigal using Pyrodigal.")
-        run_pyrodigal(input_fasta, out_dir, args.meta, args.coding_table, int(args.threads))
+        run_pyrodigal(
+            input_fasta, out_dir, args.meta, args.coding_table, int(args.threads)
+        )
     elif gene_predictor == "genbank":
         logger.info("Extracting CDS information from your genbank file.")
     elif gene_predictor == "prodigal-gv":
@@ -189,16 +221,17 @@ def main():
     translate_fastas(out_dir, gene_predictor, args.coding_table, args.infile)
 
     # run trna-scan meta mode if required
-    if args.meta == True:
-        logger.info("Starting tRNA-scanSE. Applying meta mode.")
-        run_trnascan_meta(input_fasta, out_dir, args.threads, num_fastas)
-        concat_trnascan_meta(out_dir, num_fastas)
-    else:
-        logger.info("Starting tRNA-scanSE.")
-        run_trna_scan(input_fasta, args.threads, out_dir, logdir)
-    # run minced and aragorn
-    run_minced(input_fasta, out_dir, prefix, logdir)
-    run_aragorn(input_fasta, out_dir, prefix, logdir)
+    if args.skip_extra_annotations is False:
+        if args.meta == True:
+            logger.info("Starting tRNA-scanSE. Applying meta mode.")
+            run_trnascan_meta(input_fasta, out_dir, args.threads, num_fastas)
+            concat_trnascan_meta(out_dir, num_fastas)
+        else:
+            logger.info("Starting tRNA-scanSE.")
+            run_trna_scan(input_fasta, args.threads, out_dir, logdir)
+        # run minced and aragorn
+        run_minced(input_fasta, out_dir, prefix, logdir)
+        run_aragorn(input_fasta, out_dir, prefix, logdir)
 
     # running mmseqs2 on the 2 CARD and VFDB
     run_mmseqs(
@@ -208,8 +241,10 @@ def main():
         logdir,
         gene_predictor,
         args.evalue,
+        args.sensitivity,
         db_name="CARD",
     )
+    
     run_mmseqs(
         db_dir,
         out_dir,
@@ -217,21 +252,46 @@ def main():
         logdir,
         gene_predictor,
         args.evalue,
-        db_name="VFDB",
+        args.sensitivity,
+        db_name="VFDB"
     )
+
+    # for mmseqs
+    if envhog_mmseqs is True:
+        run_mmseqs(
+            db_dir,
+            out_dir,
+            args.threads,
+            logdir,
+            gene_predictor,
+            args.evalue,
+            args.sensitivity,
+            db_name="ENVHOG"
+        )
+
+    # pyhmmer
 
     # runs pyhmmer on enVhogsROGs
-    logger.info("Running PyHMMER on EnVhogs.")
-    best_results_pyhmmer = run_pyhmmer_envhogs(
-        db_dir, out_dir, args.threads, gene_predictor, args.evalue
-    )
+    if envhog_pyhmmer is True:
+        logger.info("Running PyHMMER on EnVhogs.")
+        best_results_pyhmmer = run_pyhmmer_envhogs(
+            db_dir, out_dir, args.threads, gene_predictor, args.evalue
+        )
 
+    if envhog_hhsuite is True:
+        logger.info("Running hhsuite on EnVhogs.")
+        run_hhindex_hhblits(
+            out_dir, gene_predictor, db_dir, args.threads, args.evalue, logdir
+        )
 
     #################################################
     # post processing
     #################################################
 
     logger.info("Post Processing Output.")
+
+    if envhog_hhsuite is True:
+        hhsuite_tophits_df = process_hhsuite_results(out_dir, args.evalue)
 
     # instanatiate the class with some of the params
     pharok = Pharok()
@@ -249,7 +309,14 @@ def main():
     pharok.trna_version = trna_version
     pharok.aragorn_version = aragorn_version
     pharok.minced_version = minced_version
-    pharok.pyhmmer_results_dict = best_results_pyhmmer
+    pharok.envhog_mmseqs = envhog_mmseqs
+    pharok.envhog_pyhmmer = envhog_pyhmmer
+    pharok.envhog_hhsuite = envhog_hhsuite
+    pharok.skip_extra_annotations = args.skip_extra_annotations
+    if envhog_pyhmmer is True:  # if pyhmmer was run
+        pharok.pyhmmer_results_dict = best_results_pyhmmer
+    if envhog_hhsuite is True:
+        pharok.hhsuite_tophits_df = hhsuite_tophits_df
 
     #####################################
     # post processing
@@ -266,7 +333,8 @@ def main():
 
     # parse the aragorn output
     # get flag whether there is a tmrna from aragor
-    pharok.parse_aragorn()
+    if args.skip_extra_annotations is False:
+        pharok.parse_aragorn()
 
     # create gff and save locustag to class for table
     pharok.create_gff()
@@ -304,14 +372,18 @@ def main():
     # extract terL
     pharok.extract_terl()
 
-    # run mash
-    logger.info("Finding the closest match for each contig in INPHARED using mash.")
-    # in process.py
-    run_mash_sketch(input_fasta, out_dir, logdir)
-    run_mash_dist(out_dir, db_dir, logdir)
-    # part of the class
-    pharok.inphared_top_hits()
-
+    # skips mash
+    if args.skip_mash is False:
+        logger.info("Finding the closest match for each contig in INPHARED using mash.")
+        # in process.py
+        run_mash_sketch(input_fasta, out_dir, logdir)
+        run_mash_dist(out_dir, db_dir, logdir)
+        # part of the class
+        pharok.inphared_top_hits()
+    else:
+        logger.info(f"You have chosen --skip_mash.")
+        logger.info(f"Skipping finding the closest match for each contig in INPHARED using mash.")
+        
     # delete tmp files
     remove_post_processing_files(out_dir, gene_predictor, args.meta)
 

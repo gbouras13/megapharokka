@@ -7,14 +7,15 @@ change_header_fasta_msas.py -a <a3ms msa file> -m <FASTA msa file> -o < output F
 
 """
 
-import os
-import shutil
 import argparse
 import os
+import shutil
 import sys
 from argparse import RawTextHelpFormatter
-from loguru import logger
+
 from Bio import SeqIO
+from loguru import logger
+
 
 def get_input():
     """gets input for create_custom_hmm.py
@@ -25,11 +26,7 @@ def get_input():
         formatter_class=RawTextHelpFormatter,
     )
     parser.add_argument(
-        "-a",
-        "--a3file",
-        action="store",
-        help="Input a3m file.",
-        required=True
+        "-a", "--a3file", action="store", help="Input a3m file.", required=True
     )
 
     parser.add_argument(
@@ -38,7 +35,7 @@ def get_input():
         action="store",
         default="",
         help="Output FASTA MSAs dir.",
-        required=True
+        required=True,
     )
 
     parser.add_argument(
@@ -47,7 +44,7 @@ def get_input():
         action="store",
         default="",
         help="Input  FASTA MSA file.",
-        required=True
+        required=True,
     )
 
     parser.add_argument(
@@ -56,9 +53,8 @@ def get_input():
         action="store",
         default="",
         help="Output directory to store consensus FASTA file.",
-        required=True
+        required=True,
     )
-
 
     parser.add_argument(
         "-f", "--force", help="Overwrites the output files.", action="store_true"
@@ -81,16 +77,12 @@ def main():
 
     #### force
 
-
     # Check if the directory already exists and make the dir
     if not os.path.exists(out_dir):
         # Create the output directory
         os.mkdir(out_dir)
 
-    logger.info(
-        f"Creating MSAs in the file {out_dir} from MSAs in {MSA_file}."
-    )
-
+    logger.info(f"Creating MSAs in the file {out_dir} from MSAs in {MSA_file}.")
 
     # Check if the directory already exists and make the dir
     if not os.path.exists(cons_dir):
@@ -107,7 +99,7 @@ def main():
 
     # read in the header from a3m
     with open(a3m_file, "r") as f:
-        lines = f.read().splitlines() 
+        lines = f.read().splitlines()
         # get name and trim off the #
         header = lines[0][1:]
     f.close()
@@ -138,7 +130,6 @@ def main():
                 f"The output file {out_fasta} already exists and force was not specified. Please specify -f or --force to overwrite it."
             )
 
-
     if args.force == True:
         if os.path.isdir(cons_fasta) == True:
             logger.info(
@@ -159,7 +150,6 @@ def main():
             logger.error(
                 f"The output file {cons_fasta} already exists and force was not specified. Please specify -f or --force to overwrite it."
             )
-
 
     # final
 

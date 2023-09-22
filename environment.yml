@@ -17,5 +17,4 @@ dependencies:
   - alive-progress >=3.0.1
   - requests >=2.25.1
   - pyhmmer >=0.10.0
-
-
+  - hhsuite >=3.3.0

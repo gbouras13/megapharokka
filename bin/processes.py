@@ -1,7 +1,7 @@
+import multiprocessing.pool
 import os
 import subprocess as sp
 from datetime import datetime
-import multiprocessing.pool
 
 import pandas as pd
 import pyrodigal
@@ -28,16 +28,24 @@ def run_pyrodigal_gv(filepath_in, out_dir, threads):
     orf_finder = pyrodigal_gv.ViralGeneFinder(meta=True)
 
     def _find_genes(record):
-            genes = orf_finder.find_genes(str(record.seq))
-            return (record.id, genes)
+        genes = orf_finder.find_genes(str(record.seq))
+        return (record.id, genes)
 
     with multiprocessing.pool.ThreadPool(threads) as pool:
         with open(os.path.join(out_dir, "prodigal-gv_out.gff"), "w") as gff:
-            with open(os.path.join(out_dir, "prodigal-gv_out_tmp.fasta"), "w") as fasta:
-                records = SeqIO.parse(filepath_in, "fasta")
-                for record_id, genes in pool.imap(_find_genes, records):
-                    genes.write_gff(gff, sequence_id=record_id, include_translation_table=True)
-                    genes.write_genes(fasta, sequence_id=record_id)
+            with open(os.path.join(out_dir, "prodigal-gv_out_tmp.fasta"), "w") as dst:
+                with open(
+                    os.path.join(out_dir, "prodigal-gv_out_aas_tmp.fasta"), "w"
+                ) as aa_fasta:
+                    records = SeqIO.parse(filepath_in, "fasta")
+                    for record_id, genes in pool.imap(_find_genes, records):
+                        genes.write_gff(
+                            gff, sequence_id=record_id, include_translation_table=True
+                        )
+                        genes.write_genes(dst, sequence_id=record_id)
+                        # need to write the translation due to weird code
+                        genes.write_translations(aa_fasta, sequence_id=record_id)
+
 
 ##### phanotate meta mode ########
 
@@ -311,12 +319,17 @@ def run_pyrodigal(filepath_in, out_dir, meta, coding_table, threads):
         return (record.id, genes)
 
     with multiprocessing.pool.ThreadPool(threads) as pool:
-        with open(os.path.join(out_dir, "prodigal_out.gff"), "w") as dst:
-            with open(os.path.join(out_dir, "prodigal_out_tmp.fasta"), "w") as gff:
-                records = SeqIO.parse(filepath_in, "fasta")
-                for record_id, genes in pool.imap(_find_genes, records):
-                    genes.write_gff(dst, sequence_id=record_id)
-                    genes.write_genes(gff, sequence_id=record_id)
+        with open(os.path.join(out_dir, "prodigal_out.gff"), "w") as gff:
+            with open(os.path.join(out_dir, "prodigal_out_tmp.fasta"), "w") as dst:
+                with open(
+                    os.path.join(out_dir, "prodigal_out_aas_tmp.fasta"), "w"
+                ) as aa_fasta:
+                    records = SeqIO.parse(filepath_in, "fasta")
+                    for record_id, genes in pool.imap(_find_genes, records):
+                        genes.write_gff(gff, sequence_id=record_id)
+                        genes.write_genes(dst, sequence_id=record_id)
+                        # need to write the translation
+                        genes.write_translations(aa_fasta, sequence_id=record_id)
 
 
 def tidy_phanotate_output(out_dir):
@@ -510,6 +523,7 @@ def translate_fastas(out_dir, gene_predictor, coding_table, genbank_file):
     :param genbank_file: genbank file if gene_predictor is genbank
     :return:
     """
+
     if gene_predictor == "phanotate":
         clean_df = tidy_phanotate_output(out_dir)
     elif gene_predictor == "prodigal":
@@ -519,10 +533,13 @@ def translate_fastas(out_dir, gene_predictor, coding_table, genbank_file):
     elif gene_predictor == "genbank":
         clean_df = tidy_genbank_output(out_dir, genbank_file, coding_table)
 
-    fasta_input_tmp = gene_predictor + "_out_tmp.fasta"
     fasta_output_aas_tmp = gene_predictor + "_aas_tmp.fasta"
 
-    if gene_predictor != "genbank":
+    if (
+        gene_predictor == "phanotate"
+    ):  # for phanotate, is always table 11 - need to translate from phanotate output
+        # read the nucl fasta
+        fasta_input_tmp = gene_predictor + "_out_tmp.fasta"
         # translate for temporary AA output
         with open(os.path.join(out_dir, fasta_output_aas_tmp), "w") as aa_fa:
             i = 0
@@ -534,12 +551,34 @@ def translate_fastas(out_dir, gene_predictor, coding_table, genbank_file):
                     str(clean_df["start"].iloc[i]) + "_" + str(clean_df["stop"].iloc[i])
                 )
                 aa_record = SeqRecord(
-                    dna_record.seq.translate(to_stop=True, table=coding_table),
+                    dna_record.seq.translate(to_stop=True, table=int(11)),
                     id=dna_header,
                     description=dna_description,
                 )
                 SeqIO.write(aa_record, aa_fa, "fasta")
                 i += 1
+    elif (
+        gene_predictor == "prodigal-gv" or gene_predictor == "prodigal"
+    ):  # for prodigal and prodigal-gv
+        # read in the AA file instead and parse that to clean the header
+        fasta_input_tmp = gene_predictor + "_out_aas_tmp.fasta"
+        with open(os.path.join(out_dir, fasta_output_aas_tmp), "w") as aa_fa:
+            i = 0
+            for dna_record in SeqIO.parse(
+                os.path.join(out_dir, fasta_input_tmp), "fasta"
+            ):
+                dna_header = str(clean_df["contig"].iloc[i]) + str(i)
+                dna_description = (
+                    str(clean_df["start"].iloc[i]) + "_" + str(clean_df["stop"].iloc[i])
+                )
+                aa_record = SeqRecord(
+                    dna_record.seq,  # no translation as it reads from teh pyrodigal/pyrodigal-gv AA output
+                    id=dna_header,
+                    description=dna_description,
+                )
+                SeqIO.write(aa_record, aa_fa, "fasta")
+                i += 1
+    # for genbank do nothing
 
 
 def run_trna_scan(filepath_in, threads, out_dir, logdir):
@@ -569,16 +608,17 @@ def run_trna_scan(filepath_in, threads, out_dir, logdir):
         return 0
 
 
-def run_mmseqs(db_dir, out_dir, threads, logdir, gene_predictor, evalue, db_name):
+def run_mmseqs(db_dir, out_dir, threads, logdir, gene_predictor, evalue, sensitivity, db_name ):
     """
-    Runs mmseqs2 on phrogs
+    Runs mmseqs2 
     :param db_dir: database path
     :param out_dir: output directory
     :param logger: logger
     :params threads: threads
     :param gene_predictor: phanotate or prodigal
     :param evalue: evalue for mmseqs2
-    :param db_name: str one of 'PHROG', 'VFDB' or 'CARD'
+    :param db_name: str one of 'ENVHOG', 'VFDB' or 'CARD'
+    :param sensitivity flag for -s mmseqs2
     :return:
     """
 
@@ -588,11 +628,11 @@ def run_mmseqs(db_dir, out_dir, threads, logdir, gene_predictor, evalue, db_name
     amino_acid_fasta = gene_predictor + "_aas_tmp.fasta"
 
     # define the outputs
-    if db_name == "PHROG":
+    if db_name == "ENVHOG":
         mmseqs_dir = os.path.join(out_dir, "mmseqs/")
         target_db_dir = os.path.join(out_dir, "target_dir/")
         tmp_dir = os.path.join(out_dir, "tmp_dir/")
-        profile_db = os.path.join(db_dir, "phrogs_profile_db")
+        profile_db = os.path.join(db_dir, "EnVhog_consensus")
         mmseqs_result_tsv = os.path.join(out_dir, "mmseqs_results.tsv")
     elif db_name == "VFDB":
         mmseqs_dir = os.path.join(out_dir, "VFDB/")
@@ -630,11 +670,11 @@ def run_mmseqs(db_dir, out_dir, threads, logdir, gene_predictor, evalue, db_name
 
     result_mmseqs = os.path.join(mmseqs_dir, "results_mmseqs")
 
-    if db_name == "PHROG":
+    if db_name == "ENVHOG":
         mmseqs_search = ExternalTool(
             tool="mmseqs search",
             input=f"",
-            output=f"{tmp_dir} -s 8.5 --threads {threads}",
+            output=f"{tmp_dir} -s {sensitivity} --threads {threads}",
             params=f"-e {evalue} {profile_db} {target_seqs} {result_mmseqs}",  # param goes before output and mmseqs2 required order
             logdir=logdir,
             outfile="",
@@ -643,7 +683,7 @@ def run_mmseqs(db_dir, out_dir, threads, logdir, gene_predictor, evalue, db_name
         mmseqs_search = ExternalTool(
             tool="mmseqs search",
             input=f"",
-            output=f"{tmp_dir} -s 8.5 --threads {threads}",
+            output=f"{tmp_dir} -s {sensitivity} --threads {threads}",
             params=f"--min-seq-id 0.8 -c 0.4 {profile_db} {target_seqs} {result_mmseqs}",  # param goes before output and mmseqs2 required order
             logdir=logdir,
             outfile="",
